@@ -1,4 +1,4 @@
-# SRT - *S*ub*R*eddit *T*racking
+# SRT - SubReddit Tracking
 
 This has a few parts to it
 
