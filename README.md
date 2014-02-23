@@ -30,3 +30,27 @@ Given the age of the subreddit and the number of subscribers calculate a value.
     S = Subscriber count (-1 negates the creator)
     T = time since submission (in hours)
     G = Gravity, defaults to 1.8 (will have to play wth this) 
+
+# Usage
+
+Here's a simple go program that will print all the non 0 scores of recent subreddits
+
+    package main
+
+    import (
+      "fmt"
+	  "github.com/chuckha/srt"
+	)
+
+    func main() {
+        srs, err := srt.GetSubreddits()
+        if err != nil {
+		    panic(err)
+		}
+		for _, sr := range srs {
+		    fmt.Println(sr.Data.Name)
+		    if sr.Data.Subscribers > 1 {
+				fmt.Println(sr.Data.Score())
+			}
+		}
+	}																														
