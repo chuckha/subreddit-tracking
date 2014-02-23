@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var Key string
@@ -22,8 +23,8 @@ const newSubredditsURL = "http://www.reddit.com/subreddits/new.json?after=%v"
 type Response struct {
 	Data struct {
 		Children []sr
+		After    string
 	}
-	After string
 }
 
 type sr struct {
@@ -34,19 +35,46 @@ func GetNewSubredditsURL(after string) string {
 	return fmt.Sprintf(newSubredditsURL, after)
 }
 
-func GetSubreddits() ([]sr, error) {
-	respc := DefaultAPIPool.AddURL(GetNewSubredditsURL(""))
-	resp := <-respc
+func StartGetSubreddits() {
+	ticker := time.Tick(time.Duration(2) * time.Minute)
+	for {
+		select {
+		case <-ticker:
+			fmt.Println("Starting to get all subreddits")
+			GetSubreddits("")
+			fmt.Println("Finished getting all subreddits")
+		}
+	}
+}
 
+func GetSubreddits(after string) {
+	fmt.Println("After: " + after)
+	respc := DefaultAPIPool.AddURL(GetNewSubredditsURL(after))
+	resp := <-respc
+	if resp == nil {
+		fmt.Println("unable to get response from reddit")
+		return
+	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
+		return
 	}
 	resp.Body.Close()
 	subreddits := &Response{}
 	err = json.Unmarshal(bodybytes, subreddits)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
+		return
 	}
-	return subreddits.Data.Children, nil
+	for _, sr := range subreddits.Data.Children {
+		fmt.Println(sr.Data.Name, sr.Data.Age())
+		if sr.Data.Age() > 10 {
+			fmt.Println("Prune Tracking")
+			fmt.Println(Tracking)
+			return
+		}
+		Tracking[sr.Data.Name] = sr.Data
+	}
+	GetSubreddits(subreddits.Data.After)
 }

@@ -11,6 +11,8 @@ const (
 
 var DefaultAPIPool = NewAPIPool()
 
+var Tracking = make(map[string]Subreddit)
+
 type Subreddit struct {
 	Name        string  `json:"display_name"`
 	Title       string  `json:"title"`
