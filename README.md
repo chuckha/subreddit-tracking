@@ -5,7 +5,7 @@ This has a few parts to it
 ## Getting a list of new subreddits
 
 Every 30 minutes or so check for new subreddits that are not
-yet accounted for and add them to the pool
+yet accounted for and add them to the list of subreddits
 
 ## Getting a count of subscribers for each subreddit
 
