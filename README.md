@@ -20,6 +20,8 @@ Will have to watch out for backpressure.
 
 ## Calculating the "populatrity" metric
 
+First round is the older version of the HN metric.
+
 Given the age of the subreddit and the number of subscribers calculate a value.
 
     Score = (S-1) / (T+2)^G
