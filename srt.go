@@ -1,51 +1,36 @@
 package srt
 
 import (
-	"fmt"
 	"math"
-	"net/http"
 	"time"
 )
 
 const (
-	Gravity  = 1.8
-	AboutURL = "http://www.reddit.com/r/%v/about.json"
+	Gravity = 1.8
 )
-
-func URLForSubscriberCount(name string) string {
-	return fmt.Sprintf(AboutURL, name)
-}
 
 var DefaultAPIPool = NewAPIPool()
 
 type Subreddit struct {
-	Name        string
-	Subscribers int
-	Created     time.Time
+	Name        string  `json:"display_name"`
+	Title       string  `json:"title"`
+	Subscribers int     `json:"subscribers"`
+	Created     float64 `json:"created_utc"`
+	NSFW        bool    `json:"over18"`
 }
 
 // Return number of hours
 func (s *Subreddit) Age() float64 {
-	return time.Since(s.Created).Hours()
+	created := time.Unix(int64(s.Created), 0)
+	return time.Since(created).Hours()
 }
 func (s *Subreddit) Score() float64 {
+	if s.Subscribers-1 <= 0 {
+		return 0.0
+	}
 	return float64(s.Subscribers-1) / math.Pow(s.Age()+2.0, Gravity)
 }
 func (s *Subreddit) Update() {
-	response := make(chan *http.Response)
-	DefaultAPIPool.AddCall(URLForSubscriberCount(s.Name), response)
+	response := DefaultAPIPool.AddURL(URLForSubscriberCount(s.Name))
 	<-response
 }
-
-type APIPool struct {
-	Calls int
-	queue chan string
-}
-
-func NewAPIPool() *APIPool {
-	return &APIPool{}
-}
-
-func (a *APIPool) AddCall(URL string, resp chan *http.Response) {}
-func (a *APIPool) FillPool()                                    {}
-func (a *APIPool) DrainPool()                                   {}

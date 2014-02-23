@@ -2,7 +2,6 @@ package srt
 
 import (
 	"testing"
-	"time"
 )
 
 var agetc = []struct {
@@ -14,7 +13,7 @@ var agetc = []struct {
 		sr: &Subreddit{
 			Name:        "golang",
 			Subscribers: 7274,
-			Created:     time.Unix(1257900868, 0),
+			Created:     1257900868.0,
 		},
 		age:   37575.7,
 		score: 4.2348429747663435e-05,
@@ -23,10 +22,19 @@ var agetc = []struct {
 		sr: &Subreddit{
 			Name:        "funny",
 			Subscribers: 5403592,
-			Created:     time.Unix(1201242956, 0),
+			Created:     1201242956.0,
 		},
 		age:   53314.1,
 		score: 0.016762379635540822,
+	},
+	{
+		sr: &Subreddit{
+			Name:        "hihi",
+			Subscribers: 0,
+			Created:     1.39317414E9,
+		},
+		age:   .02,
+		score: 0.0,
 	},
 }
 
@@ -41,7 +49,7 @@ func TestSubredditScore(t *testing.T) {
 func TestSubredditAge(t *testing.T) {
 	for _, tc := range agetc {
 		if tc.sr.Age() < tc.age {
-			t.Errorf("Exepcted %v to be at least %v old", tc.sr, tc.age)
+			t.Errorf("Exepcted %v to be at least %v old: %v", tc.sr, tc.age, tc.sr.Age())
 		}
 	}
 }

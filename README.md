@@ -13,7 +13,7 @@ The reddit API asks that we make only 30 API calls / minute so if this app
 is tracking 30 subreddits they can all be updated in one minute.
 
 To make sure I don't pass 30 calls/minute, I'm going to have a pool of api
-calls I'm allowed to make that gets filled at a rate of 1call/500ms.
+calls I'm allowed to make that gets filled at a rate of 1call/2000ms.
 Then every API call will go through this pool.
 
 Will have to watch out for backpressure.
