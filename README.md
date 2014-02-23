@@ -38,19 +38,16 @@ Here's a simple go program that will print all the non 0 scores of recent subred
     package main
 
     import (
-      "fmt"
-	  "github.com/chuckha/srt"
+    	"fmt"
+	    "github.com/chuckha/srt"
 	)
 
     func main() {
-        srs, err := srt.GetSubreddits()
-        if err != nil {
-		    panic(err)
-		}
-		for _, sr := range srs {
-		    fmt.Println(sr.Data.Name)
-		    if sr.Data.Subscribers > 1 {
-				fmt.Println(sr.Data.Score())
+	    srt.GetSubreddits("")
+		for k, sr := range srt.Tracking {
+		    fmt.Println(k, sr)
+			if sr.Subscribers > 1 {
+			    fmt.Println(sr.Score())
 			}
 		}
-	}																														
+	}
