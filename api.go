@@ -2,6 +2,7 @@ package srt
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -35,46 +36,49 @@ func GetNewSubredditsURL(after string) string {
 	return fmt.Sprintf(newSubredditsURL, after)
 }
 
-func StartGetSubreddits() {
-	ticker := time.Tick(time.Duration(2) * time.Minute)
+// Frequency in minutes
+func StartGetSubreddits(frequency int) {
+	ticker := time.Tick(time.Duration(frequency) * time.Minute)
 	for {
 		select {
 		case <-ticker:
 			fmt.Println("Starting to get all subreddits")
-			GetSubreddits("")
+			var err error
+			var after string
+			for err == nil {
+				after, err = getSubreddits(after)
+			}
+			fmt.Println(err)
 			fmt.Println("Finished getting all subreddits")
 		}
 	}
 }
 
-func GetSubreddits(after string) {
-	fmt.Println("After: " + after)
+// Gets a set of subreddits and returns the "after" (the code to get the next set of subreddits).
+// Returns an error when there are no more or errors.
+func getSubreddits(after string) (string, error) {
 	respc := DefaultAPIPool.AddURL(GetNewSubredditsURL(after))
 	resp := <-respc
 	if resp == nil {
-		fmt.Println("unable to get response from reddit")
-		return
+		return "", errors.New("unable to get a response from Reddit")
 	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return "", err
 	}
 	resp.Body.Close()
 	subreddits := &Response{}
 	err = json.Unmarshal(bodybytes, subreddits)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return "", err
 	}
 	for _, sr := range subreddits.Data.Children {
 		fmt.Println(sr.Data.Name, sr.Data.Age())
 		if sr.Data.Age() > 10 {
 			fmt.Println("Prune Tracking")
-			fmt.Println(Tracking)
-			return
+			return "", errors.New("end of subreddits")
 		}
 		Tracking[sr.Data.Name] = sr.Data
 	}
-	GetSubreddits(subreddits.Data.After)
+	return subreddits.Data.After, nil
 }
