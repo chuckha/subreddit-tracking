@@ -43,9 +43,9 @@ Here's a simple go program that will print all the non 0 scores of recent subred
 	)
 
     func main() {
-	    srt.GetSubreddits("")
+	    srt.StartGetSubreddits(2)
 		for k, sr := range srt.Tracking {
-		    fmt.Println(k, sr)
+	        fmt.Println(k, sr)
 			if sr.Subscribers > 1 {
 			    fmt.Println(sr.Score())
 			}
