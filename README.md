@@ -33,7 +33,10 @@ Given the age of the subreddit and the number of subscribers calculate a value.
 
 # Usage
 
-Here's a simple go program that will print all the non 0 scores of recent subreddits
+Here's a simple go program that will print all the non 0 scores of recent subreddits.
+When you start the program, we start acquiring API calls. This will let us burst
+after our intial wait period. So after 2 minutes we will go get all the subreddits in
+quick succession.
 
     package main
 
